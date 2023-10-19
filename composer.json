@@ -1,0 +1,40 @@
+{
+    "name": "dorcas/modules-admin",
+    "description": "Dorcas Hub Partner Administration Module",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Ifeoluwa Olawoye",
+            "email": "bolaji.olawoye@hostvillenigeria.org"
+        }
+    ],
+    "require": {
+        "php": "^7.2|^8.0|^8.1|^8.2",
+        "aws/aws-sdk-php": "^3.74",
+        "guzzlehttp/guzzle": "^7.4.5",
+
+        "laravel/framework": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Dorcas\\ModulesAdmin\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dorcas\\ModulesAdmin\\ModulesAdminServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
