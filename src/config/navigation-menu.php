@@ -7,4 +7,4 @@ $menuAdmin = [
     ]
 ];
 
-return $menuBimenuAdminlling;
+return $menuAdmin;
