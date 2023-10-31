@@ -9,7 +9,7 @@ Route::group(['namespace' => 'Dorcas\ModulesAdmin\Http\Controllers', 'prefix' =>
     Route::get('/admin-main', 'ModulesAdminController@index')->name('admin-main');
 });
 
-Route::group(['namespace' => 'Dorcas\ModulesAdmin\Http\Controllers', 'prefix' => 'admin/endpoint', 'middleware' => ['dorcasAdmin']], function() {
+Route::group(['namespace' => 'Dorcas\ModulesAdmin\Http\Controllers', 'prefix' => 'admin/endpoint', 'middleware' => ['dorcasBridgeAdmin']], function() {
     Route::get('/test', 'ModulesAdminEndpointController@test');
 });
 
