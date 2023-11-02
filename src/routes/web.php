@@ -11,7 +11,8 @@ Route::group(['namespace' => 'Dorcas\ModulesAdmin\Http\Controllers', 'prefix' =>
 
 Route::group(['namespace' => 'Dorcas\ModulesAdmin\Http\Controllers', 'prefix' => 'admin/endpoint', 'middleware' => ['dorcasBridgeAdmin']], function() {
     Route::get('/test', 'ModulesAdminEndpointController@test');
-    Route::post('/', 'ModulesAdminEndpointController@feature');
+    Route::post('/permissions', 'ModulesAdminEndpointController@permissions');
+    Route::post('/feature', 'ModulesAdminEndpointController@feature');
 });
 
 
