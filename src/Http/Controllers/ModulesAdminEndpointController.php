@@ -128,16 +128,16 @@ class ModulesAdminEndpointController extends Controller {
                         "column_local" => "o.company_id",
                         "column_foreign" => "c.id"
                     ],
-                    [
-                        "table" => "customer_order as co",
-                        "column_local" => "o.id",
-                        "column_foreign" => "co.order_id"
-                    ],
-                    [
-                        "table" => "customers as cc",
-                        "column_local" => "co.customer_id",
-                        "column_foreign" => "cc.id"
-                    ],
+                    // [
+                    //     "table" => "customer_order as co",
+                    //     "column_local" => "o.id",
+                    //     "column_foreign" => "co.order_id"
+                    // ],
+                    // [
+                    //     "table" => "customers as cc",
+                    //     "column_local" => "co.customer_id",
+                    //     "column_foreign" => "cc.id"
+                    // ],
                     [
                         "table" => "order_items as i",
                         "column_local" => "o.id",
@@ -152,19 +152,19 @@ class ModulesAdminEndpointController extends Controller {
                 $data_package["select"] = $pre ? ["o.uuid", "o.updated_at"] : [
                     "o.uuid",
                     DB::raw('c.uuid as company_id'),
-                    DB::raw('cc.uuid as customer_id'),
+                    //DB::raw('cc.uuid as customer_id'),
                     "o.status",
                     "o.currency",
                     "o.amount",
-                    "co.is_paid",
-                    "co.paid_at",
+                    //"co.is_paid",
+                    //"co.paid_at",
+                    //DB::raw('JSON_OBJECT("is_paid", co.is_paid, "paid_at", co.paid_at) as order_data'),
                     DB::raw('JSON_OBJECT("due_at", o.due_at, "reminder_on", o.reminder_on, "is_quote", o.is_quote) as other_data'),
-                    DB::raw('JSON_OBJECTAGG(i.quantity, i.unit_price, p.name) as order_items'),
-                    //JSON_OBJECTAGG(First_Name, Socre_In_Exhibiiton_match)
+                    DB::raw('JSON_OBJECTAGG( CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price), CONCAT(o.currency, i.quantity * i.unit_price) ) as order_items'),
                     "o.created_at",
                     "o.updated_at",
                 ];
-                $data_package["group_by"] = "o.id";
+                $data_package["group_by"] = ["o.id"];
                 break;
 
             case "customers":
@@ -192,6 +192,7 @@ class ModulesAdminEndpointController extends Controller {
 
         try {
 
+            //DB::statement("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $data = DB::connection('core_mysql')->table($data_package["table"]);
 
             if (!$pre && !empty($data_package["joins"])) {
@@ -206,7 +207,7 @@ class ModulesAdminEndpointController extends Controller {
             if (!empty($data_package["select"])) {
                 $data->select($data_package["select"]);
             }
-            if (!empty($data_package["select"])) {
+            if (!empty($data_package["group_by"])) {
                 $data->groupBy($data_package["group_by"][0]);
             }
 
