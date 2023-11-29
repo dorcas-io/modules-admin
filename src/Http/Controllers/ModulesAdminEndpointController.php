@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 class ModulesAdminEndpointController extends Controller {
 
 
-    private const FEATURES = ['businesses', 'orders', 'customers'];
+    private const FEATURES = ['businesses', 'orders', 'customers', 'products'];
 
     private $partner;
 
@@ -90,14 +90,21 @@ class ModulesAdminEndpointController extends Controller {
         $this->data['feature'] = $feature = $request->feature;
 
         $pre = !empty($request->pre) && ( $request->pre === true || $request->pre === "true" ) ? true : false;
+
+        $payload = !empty($request->payload) ? $request->payload : null;
     	
         $data_package = [
             "table" => "",
             "where" => [],
             "select" => [],
             "joins" => [],
-            "group_by" => []
+            "group_by" => [],
+            "where_in" => []
         ];
+
+        if (!empty($payload) && isset($payload["where_in"])) {
+            $data_package["where_in"] = $payload["where_in"];
+        }
 
         switch ($feature) {
 
@@ -176,13 +183,34 @@ class ModulesAdminEndpointController extends Controller {
                 ];
                 $data_package["select"] = $pre ? ["cs.uuid", "cs.updated_at"] : [
                     "cs.uuid",
-                    \DB::raw('c.uuid as company_id'),
+                    DB::raw('c.uuid as company_id'),
                     "cs.firstname",
                     "cs.lastname",
                     "cs.phone",
                     "cs.email",
                     "cs.created_at",
                     "cs.updated_at",
+
+                ];
+                break;
+
+            case "products":
+                $data_package["table"] = "products as p";
+                $data_package["joins"][] = [
+                    "table" => "companies as c",
+                    "column_local" => "p.company_id",
+                    "column_foreign" => "c.id"
+                ];
+                $data_package["select"] = $pre ? ["p.uuid", "p.updated_at"] : [
+                    "p.uuid",
+                    DB::raw('c.uuid as company_id'),
+                    "p.name",
+                    "p.product_type",
+                    "p.product_variant",
+                    "p.product_variant_type",
+                    "p.product_parent",
+                    "p.created_at",
+                    "p.updated_at",
 
                 ];
                 break;
@@ -204,6 +232,11 @@ class ModulesAdminEndpointController extends Controller {
             if (!empty($data_package["where"])) {
                 $data->where($data_package["where"]);
             }
+
+            if (!empty($data_package["where_in"])) {
+                $data->whereIn($data_package["where_in"]["column"], $data_package["where_in"]["data"]);
+            }
+
             if (!empty($data_package["select"])) {
                 $data->select($data_package["select"]);
             }
