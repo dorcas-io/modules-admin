@@ -239,7 +239,7 @@ class ModulesAdminEndpointController extends Controller {
             }
 
             if (!empty($data_package["where_in"])) {
-                $c = $column_prefix . $data_package["where_in"]["column"];
+                $c = $column_prefix . "." . $data_package["where_in"]["column"];
                 $data->whereIn($c, $data_package["where_in"]["data"]);
             }
 
