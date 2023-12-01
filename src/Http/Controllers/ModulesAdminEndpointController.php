@@ -109,12 +109,21 @@ class ModulesAdminEndpointController extends Controller {
         }
 
         switch ($feature) {
-
+/*
+$companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
+    ->leftJoin('partners', 'staff.partner_id', '=', 'partners.id')
+    ->select(
+        'companies.*', // Select all columns from the companies table
+        DB::raw('(SELECT partner_id FROM staff WHERE company_id = companies.id ORDER BY id LIMIT 1) as first_staff_partner_id')
+    )
+    ->get();
+*/
             case "businesses":
                 $data_package["table"] = "companies as c";
                 $data_package["joins"] = [];
                 $data_package["select"] = $pre ? ["c.uuid", "c.updated_at"] : [
                     "c.uuid",
+                    DB::raw('(SELECT p.uuid FROM users as u left join partners as p on u.partner_id=p.id WHERE u.company_id = c.id ORDER BY u.id ASC LIMIT 1) as partner_id'),
                     "c.name",
                     "c.phone",
                     "c.email",
