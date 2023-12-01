@@ -102,6 +102,8 @@ class ModulesAdminEndpointController extends Controller {
             "where_in" => []
         ];
 
+        $column_prefix = "";
+
         if (!empty($payload) && isset($payload["where_in"])) {
             $data_package["where_in"] = $payload["where_in"];
         }
@@ -124,7 +126,7 @@ class ModulesAdminEndpointController extends Controller {
                     "c.updated_at",
                 ];
 
-
+                $column_prefix = "c";
                 break;
 
             case "orders":
@@ -172,6 +174,7 @@ class ModulesAdminEndpointController extends Controller {
                     "o.updated_at",
                 ];
                 $data_package["group_by"] = ["o.id"];
+                $column_prefix = "o";
                 break;
 
             case "customers":
@@ -192,6 +195,7 @@ class ModulesAdminEndpointController extends Controller {
                     "cs.updated_at",
 
                 ];
+                $column_prefix = "cs";
                 break;
 
             case "products":
@@ -211,8 +215,8 @@ class ModulesAdminEndpointController extends Controller {
                     "p.product_parent",
                     "p.created_at",
                     "p.updated_at",
-
                 ];
+                $column_prefix = "p";
                 break;
 
         }
@@ -229,17 +233,20 @@ class ModulesAdminEndpointController extends Controller {
                     $data->join($join["table"], $join["column_local"], '=', $join["column_foreign"]);
                 }
             }
+
             if (!empty($data_package["where"])) {
                 $data->where($data_package["where"]);
             }
 
             if (!empty($data_package["where_in"])) {
-                $data->whereIn($data_package["where_in"]["column"], $data_package["where_in"]["data"]);
+                $c = $column_prefix . $data_package["where_in"]["column"];
+                $data->whereIn($c, $data_package["where_in"]["data"]);
             }
 
             if (!empty($data_package["select"])) {
                 $data->select($data_package["select"]);
             }
+            
             if (!empty($data_package["group_by"])) {
                 $data->groupBy($data_package["group_by"][0]);
             }
