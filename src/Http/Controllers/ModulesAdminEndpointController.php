@@ -171,6 +171,7 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                     "o.uuid",
                     DB::raw('c.uuid as company_id'),
                     //DB::raw('cc.uuid as customer_id'),
+                    "o.title",
                     "o.status",
                     "o.currency",
                     "o.amount",
