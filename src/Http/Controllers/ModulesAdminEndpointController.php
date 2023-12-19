@@ -146,16 +146,16 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                         "column_local" => "o.company_id",
                         "column_foreign" => "c.id"
                     ],
-                    // [
-                    //     "table" => "customer_order as co",
-                    //     "column_local" => "o.id",
-                    //     "column_foreign" => "co.order_id"
-                    // ],
-                    // [
-                    //     "table" => "customers as cc",
-                    //     "column_local" => "co.customer_id",
-                    //     "column_foreign" => "cc.id"
-                    // ],
+                    [
+                        "table" => "customer_order as co",
+                        "column_local" => "o.id",
+                        "column_foreign" => "co.order_id"
+                    ],
+                    [
+                        "table" => "customers as cc",
+                        "column_local" => "co.customer_id",
+                        "column_foreign" => "cc.id"
+                    ],
                     [
                         "table" => "order_items as i",
                         "column_local" => "o.id",
@@ -170,7 +170,7 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                 $data_package["select"] = $pre ? ["o.uuid", "o.updated_at"] : [
                     "o.uuid",
                     DB::raw('c.uuid as company_id'),
-                    //DB::raw('cc.uuid as customer_id'),
+                    DB::raw('MAX(cc.uuid) as customer_id'),
                     "o.title",
                     "o.status",
                     "o.currency",
@@ -180,7 +180,7 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                     //"co.paid_at",
                     //DB::raw('JSON_OBJECT("is_paid", co.is_paid, "paid_at", co.paid_at) as order_data'),
                     DB::raw('JSON_OBJECT("due_at", o.due_at, "reminder_on", o.reminder_on) as other_data'),
-                    DB::raw('JSON_OBJECTAGG( CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price), CONCAT(o.currency, i.quantity * i.unit_price) ) as order_items'),
+                    DB::raw('JSON_OBJECTAGG( CONCAT("item"), CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price, " => ", o.currency, i.quantity * i.unit_price) ) as order_items'),
                     "o.created_at",
                     "o.updated_at",
                 ];

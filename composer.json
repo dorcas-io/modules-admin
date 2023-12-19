@@ -13,7 +13,6 @@
         "php": "^7.2|^8.0|^8.1|^8.2",
         "aws/aws-sdk-php": "^3.74",
         "guzzlehttp/guzzle": "^7.4.5",
-
         "laravel/framework": "^8.0"
     },
     "require-dev": {
