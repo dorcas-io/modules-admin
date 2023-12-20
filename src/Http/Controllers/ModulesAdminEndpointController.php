@@ -157,11 +157,13 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                         "column_foreign" => "cc.id"
                     ],
                     [
+                        "direction" => "leftJoin",
                         "table" => "order_items as i",
                         "column_local" => "o.id",
                         "column_foreign" => "i.order_id"
                     ],
                     [
+                        "direction" => "leftJoin",
                         "table" => "products as p",
                         "column_local" => "i.product_id",
                         "column_foreign" => "p.id"
@@ -180,7 +182,9 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
                     //"co.paid_at",
                     //DB::raw('JSON_OBJECT("is_paid", co.is_paid, "paid_at", co.paid_at) as order_data'),
                     DB::raw('JSON_OBJECT("due_at", o.due_at, "reminder_on", o.reminder_on) as other_data'),
-                    DB::raw('JSON_OBJECTAGG( CONCAT("item"), CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price, " => ", o.currency, i.quantity * i.unit_price) ) as order_items'),
+                    // JSON_OBJECT("item", CONCAT(o.quantity, "x ", o.product_name, " @ ", o.currency, o.unit_price, " => ", o.currency, o.quantity * o.unit_price))
+                    DB::raw('IF(i.order_id IS NULL, JSON_OBJECT("item", CONCAT(o.quantity, "x ", o.product_name, " @ ", o.currency, o.unit_price, " => ", o.currency, o.quantity * o.unit_price)), JSON_OBJECTAGG( CONCAT("item"), CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price, " => ", o.currency, i.quantity * i.unit_price) )) as order_items'),
+                    //DB::raw('JSON_OBJECTAGG( CONCAT("item"), CONCAT(i.quantity, "x ", p.name, " @ ", o.currency, i.unit_price, " => ", o.currency, i.quantity * i.unit_price) ) as order_items'),
                     "o.created_at",
                     "o.updated_at",
                 ];
@@ -241,7 +245,13 @@ $companies = Company::leftJoin('staff', 'companies.id', '=', 'staff.company_id')
             if (!$pre && !empty($data_package["joins"])) {
                 for ($i=0; $i < count($data_package["joins"]); $i++) { 
                     $join = $data_package["joins"][$i];
-                    $data->join($join["table"], $join["column_local"], '=', $join["column_foreign"]);
+                    if (isset($join["direction"]) && in_array($join["direction"], ["leftJoin", "leftJoin", "outerJoin", "innerJoin"])) {
+                        $dir = $join["direction"];
+                        $data->$dir($join["table"], $join["column_local"], '=', $join["column_foreign"]);
+                    } else {
+                        $data->join($join["table"], $join["column_local"], '=', $join["column_foreign"]);
+                    }
+                    
                 }
             }
 
